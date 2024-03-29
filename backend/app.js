@@ -1,9 +1,13 @@
-const express = require("express")
+
+import express from "express";
 const app = express()
 const port = 5000
-require('dotenv').config();
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser')
+import dotenv from "dotenv"
+dotenv.config()
+import bodyParser from "body-parser";
+import cors from "cors"
+import userrouter from "./Routes/userRoute.js";
+import mongoose from "mongoose";
 
 const mongodb = "mongodb://127.0.0.1:27017/clone";
 
@@ -19,6 +23,9 @@ async function main(){
 app.use(bodyParser.urlencoded({extended:true}))
 app.use(bodyParser.json())
 app.use(express.json())
+app.use(cors())
+
+app.use('/api/users' , userrouter)
 
 
 
