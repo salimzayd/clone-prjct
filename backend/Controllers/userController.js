@@ -1,39 +1,68 @@
-import user from "../Modles/UserSchema.js";
+import tryCatchMiddleware from "../Middlewares/tryCatchMiddleware.js";
+import users from "../Modles/UserSchema.js";
 import joiUserSchema  from "../Modles/validationSchema.js";
 import bcrypt from 'bcrypt'
-// import { Jwt } from "jsonwebtoken";
+// import jwt from 'jsonwebtoken' 
+import { sendOTP } from "../OTP/Otp.js";
 
 
-export const userRegister=  async (req,res) =>{
+export const userRegister=  async (req,res,next) =>{
+
+    try{
     const {value,error} = joiUserSchema.validate(req.body)
-    const {name,email,phonenumber,password} = value;
-    const hashpassword = await bcrypt.hash(password,10)
+    if(error){
+        return res.status(400).json({
+            status:"error",
+            message:error.details[0].message
+        });
+    }
 
-    if (error){
+    const {name,email,phonenumber,password} = value
+
+    // checking existence 
+    const existinguser = await users.findOne({name:name})
+    if(existinguser){
         res.status(400).json({
             status:"error",
-            message:"invalid user"
+            message:"username already exist"
         })
     }
 
-    const existinguser = await user.findOne({name:name})
+    // otp sending
 
-    if (existinguser){
-        res.status(400).json({
+    try{
+    await sendOTP(req,res);
+
+    await newUser.save();
+    res.status(201).json("user created successfully")
+    }catch(error){
+        next(error)
+    }
+    // password hashing
+
+    const hashedpassword = await 
+    bcrypt.hash(password,10)
+
+    // user creation 
+
+    const userData = await users.create({
+        name:name,
+        email:email,
+        phonenumber:phonenumber,
+        password:hashedpassword
+    });
+
+    // success response 
+    return res.status(200).json({
+        status:"success",
+        message:"user registered successfully",
+        data:userData
+    })
+    }catch(error){
+        console.error(error);
+        return res.status(500).json({
             status:"error",
-            message:"username already taken"
-        })
-    }else{
-        const userdata = await user.create({
-            name:name,
-            email:email,
-            phonenumber:phonenumber,
-            password:hashpassword
-        }) 
-        return res.status(201).json({
-            status:"success",
-            message:"user registered successfully",
-            data:userdata
+            message:"an unexpected error occured"
         })
     }
-    }
+    };  

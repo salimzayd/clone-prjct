@@ -9,15 +9,16 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.5.0",
     "mongoose": "^8.2.1",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "twilio": "^5.0.1"
   },
   "name": "backend",
   "version": "1.0.0",
   "main": "app.js",
-  "type" : "module",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "devstart":"nodemon app.js"
+    "devstart": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
