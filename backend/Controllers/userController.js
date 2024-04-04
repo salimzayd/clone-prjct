@@ -2,7 +2,7 @@ import tryCatchMiddleware from "../Middlewares/tryCatchMiddleware.js";
 import users from "../Modles/UserSchema.js";
 import joiUserSchema  from "../Modles/validationSchema.js";
 import bcrypt from 'bcrypt'
-// import jwt from 'jsonwebtoken' 
+import jwt from 'jsonwebtoken' 
 import { sendOTP } from "../OTP/Otp.js";
 
 
@@ -65,4 +65,50 @@ export const userRegister=  async (req,res,next) =>{
             message:"an unexpected error occured"
         })
     }
-    };  
+    
+    };
+    
+    //User login
+export const Login = async (req, res) => {
+    try {
+      const { email, password } = req.body;
+  
+      // Check user
+      const user = await users.findOne({ email });
+  
+      if (!user) {
+        return res.status(404).json({
+          status: "error",
+          message: "Invalid email or password",
+        });
+      }
+  
+      // Check password
+      const passwordMatch = await bcrypt.compare(password, user.password);
+  
+      if (!passwordMatch) {
+        return res.status(401).json({
+          status: "error", 
+          message: "Invalid email or password",
+        });
+      }
+  
+      // Generate and send token
+      const token = jwt.sign({ id: user._id }, process.env.User_ACCESS_TOKEN_SECRET, {
+        expiresIn: "1h"
+      });
+  
+      return res.status(200).json({
+        status: "success",
+        message: "User login successful",
+        token: token
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        status: "error",
+        message: "An unexpected error occurred",
+        error: error.message
+    });
+    }
+  };
