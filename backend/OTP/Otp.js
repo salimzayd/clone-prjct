@@ -4,12 +4,13 @@ dotenv.config()
 
 const accountSid = process.env.Account_SID;
 const authToken = process.env.Auth_Token;
+const serviceid= process.env.Service_id;
 const client = twilio(accountSid, authToken);
 
 export const sendOTP = async (req, res) => {
     const { phonenumber } = req.body;
     try {
-        await client.verify.v2.services("VAac58cb858a70083ca23aa10fa28d308d") 
+        await client.verify.v2.services(serviceid) 
             .verifications.create({
                 to: "+91" + phonenumber,
                 channel: "sms"
@@ -35,7 +36,7 @@ export const verifyOtp = async (req, res) =>{
     const {phonenumber, otp} = req.body
     console.log(req.body);
     try{
-        const verificationCheck = await client.verify.v2.services("VAac58cb858a70083ca23aa10fa28d308d").verificationChecks.create({
+        const verificationCheck = await client.verify.v2.services(serviceid).verificationChecks.create({
             to:"+91" + phonenumber,
             code:otp
         });
