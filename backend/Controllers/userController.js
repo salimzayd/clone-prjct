@@ -2,6 +2,8 @@ import tryCatchMiddleware from "../Middlewares/tryCatchMiddleware.js";
 import users from "../Modles/UserSchema.js";
 import joiUserSchema  from "../Modles/validationSchema.js";
 import bcrypt from 'bcrypt'
+import eventemitter from 'events'
+eventemitter.defaultMaxListeners = 15;
 import jwt from 'jsonwebtoken' 
 import { sendOTP } from "../OTP/Otp.js";
 

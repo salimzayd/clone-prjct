@@ -7,7 +7,10 @@ const userSchema = new mongoose.Schema({
     phonenumber:Number,
     password:String,
 
-})
+    cart:[{type:mongoose.Schema.ObjectId,ref:'product'}],
+    orders:[{type:mongoose.Schema.ObjectId,ref:'orders'}]
+
+},{timestamps:true})
 
 const usermodel =  mongoose.model("users", userSchema)
 
