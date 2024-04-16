@@ -21,4 +21,6 @@ const joiproductSchema = Joi.object({
 
 
 
-export default  {joiUserSchema,joiproductSchema}
+const Schemas = { joiUserSchema,joiproductSchema} 
+
+export default Schemas

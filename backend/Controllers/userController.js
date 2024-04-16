@@ -1,6 +1,6 @@
 import tryCatchMiddleware from "../Middlewares/tryCatchMiddleware.js";
 import users from "../Modles/UserSchema.js";
-import joiUserSchema  from "../Modles/validationSchema.js";
+import Schemas from "../Modles/validationSchema.js";
 import bcrypt from 'bcrypt'
 import eventemitter from 'events'
 eventemitter.defaultMaxListeners = 15;
@@ -11,7 +11,7 @@ import { sendOTP } from "../OTP/Otp.js";
 export const userRegister=  async (req,res,next) =>{
 
     try{
-    const {value,error} = joiUserSchema.validate(req.body)
+    const {value,error} = Schemas.joiUserSchema.validate(req.body)
     if(error){
         return res.status(400).json({
             status:"error",
@@ -35,7 +35,7 @@ export const userRegister=  async (req,res,next) =>{
     try{
     await sendOTP(req,res);
 
-    await newUser.save();
+    await users.save();
     res.status(201).json("user created successfully")
     }catch(error){
         next(error)
