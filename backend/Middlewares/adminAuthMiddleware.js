@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 
-export const verifyToken = (req,res,next) =>{
+const verifyToken = (req,res,next) =>{
     const token = req.headers["authorization"]
     console.log("dxgfh",token);
 
@@ -20,3 +20,4 @@ export const verifyToken = (req,res,next) =>{
         next()
     })
 } 
+export default verifyToken

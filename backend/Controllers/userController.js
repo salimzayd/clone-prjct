@@ -2,8 +2,8 @@ import tryCatchMiddleware from "../Middlewares/tryCatchMiddleware.js";
 import users from "../Modles/UserSchema.js";
 import Schemas from "../Modles/validationSchema.js";
 import bcrypt from 'bcrypt'
-import eventemitter from 'events'
-eventemitter.defaultMaxListeners = 15;
+// import eventemitter from 'events'
+// eventemitter.defaultMaxListeners = 15;
 import jwt from 'jsonwebtoken' 
 import { sendOTP } from "../OTP/Otp.js";
 
@@ -71,46 +71,40 @@ export const userRegister=  async (req,res,next) =>{
     };
     
     //User login
-export const Login = async (req, res) => {
-    try {
-      const { email, password } = req.body;
-  
-      // Check user
-      const user = await users.findOne({ email });
-  
-      if (!user) {
+export const Login = async (req, res,next) => {
+  const {value,error} = Schemas.joiUserSchema.validate(req.body);
+
+  if(error){
+    res.json(error.message)
+  }
+  const {email,password} = value;
+
+  try{
+    // finding user by email
+    const validuser = await users.findOne({email})
+
+    if(!validuser){
+      return res.status(404).json({
+        status:"error",
+        message:"user not found"
+
+      })}
+      // checking password
+      const validpassword = await bcrypt.compare(password,validuser.password);
+      if(!validpassword){
         return res.status(404).json({
-          status: "error",
-          message: "Invalid email or password",
-        });
+          status:"error",
+          message:"incorrect pasword"
+        })
       }
-  
-      // Check password
-      const passwordMatch = await bcrypt.compare(password, user.password);
-  
-      if (!passwordMatch) {
-        return res.status(401).json({
-          status: "error", 
-          message: "Invalid email or password",
-        });
-      }
-  
-      // Generate and send token
-      const token = jwt.sign({ id: user._id }, process.env.User_ACCESS_TOKEN_SECRET, {
-        expiresIn: "1h"
-      });
-  
-      return res.status(200).json({
-        status: "success",
-        message: "User login successful",
-        token: token
-      });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-        status: "error",
-        message: "An unexpected error occurred",
-        error: error.message
-    });
+      // creating token
+      const token = jwt.sign({
+        id:validuser._id},
+      process.env.User_ACCESS_TOKEN_SECRET);
+      res.status(200).json({
+        token,user:validuser
+      })
+    }catch(error){
+      next(error)
     }
-  };
+};

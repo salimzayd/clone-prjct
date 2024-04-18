@@ -1,13 +1,15 @@
 import express from 'express';
-import router from express.Router()
-import admin, { adminlogin } from '../Controllers/adminController'
-import  verifyToken  from '../Middlewares/adminAuthMiddleware';
+const adminroute = express.Router()
+import  { adminlogin ,createproduct} from '../Controllers/adminController.js'
+import  verifyToken  from '../Middlewares/adminAuthMiddleware.js';
 
-import tryCatchMiddleware from '../Middlewares/tryCatchMiddleware';
-import imageUpload from '../Middlewares/imageUpload/imageUpload';
-import adminController from '../Controllers/adminController'
+import tryCatchMiddleware from '../Middlewares/tryCatchMiddleware.js';
+import imageUpload from '../Middlewares/imageUpload/imageUpload.js';
 
-router
+adminroute
 
 .post("/login",tryCatchMiddleware(adminlogin))
 .use(verifyToken)
+.post('/product',imageUpload,createproduct)
+
+export default adminroute

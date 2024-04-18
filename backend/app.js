@@ -8,6 +8,7 @@ import bodyParser from "body-parser";
 import cors from "cors"
 import userrouter from "./Routes/userRoute.js";
 import mongoose from "mongoose";
+import adminroute from "./Routes/adminRoute.js";
 
 const mongodb = "mongodb://127.0.0.1:27017/clone";
 
@@ -26,6 +27,7 @@ app.use(express.json())
 app.use(cors())
 
 app.use('/api/users' , userrouter)
+app.use('/api/admin',adminroute)
 
 
 

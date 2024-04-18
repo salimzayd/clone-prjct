@@ -14,8 +14,7 @@ const joiproductSchema = Joi.object({
     image:Joi.string(),
     title:Joi.string(),
     category:Joi.string(),
-    price:Joi.number().positive(),
-    reviews:Joi.string()
+    price:Joi.number().positive()
 })
 
 
