@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 
 const verifyToken = (req,res,next) =>{
     const token = req.headers["authorization"]
-    console.log("dxgfh",token);
+    console.log("token",token);
 
 
     if(!token){

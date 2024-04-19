@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken'
-import Schemas from '../Modles/validationSchema.js';
-import product from '../Modles/productSchema.js';
+import Schemas from '../modles/validationSchema.js';
+import product from '../modles/productSchema.js';
 
 
 export const adminlogin = async (req,res) =>{
@@ -31,6 +31,7 @@ export const adminlogin = async (req,res) =>{
 
 export const createproduct = async (req,res) =>{
     const {value,error} = Schemas.joiproductSchema.validate(req.body)
+    console.log(req.body);
 
 const {title,image,category,price} = value;
 console.log(value);

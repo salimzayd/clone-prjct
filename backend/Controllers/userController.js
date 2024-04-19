@@ -1,11 +1,12 @@
-import tryCatchMiddleware from "../Middlewares/tryCatchMiddleware.js";
-import users from "../Modles/UserSchema.js";
-import Schemas from "../Modles/validationSchema.js";
+import tryCatchMiddleware from "../middlewares/tryCatchMiddleware.js";
+import users from "../modles/UserSchema.js";
+import Schemas from "../modles/validationSchema.js";
 import bcrypt from 'bcrypt'
 // import eventemitter from 'events'
 // eventemitter.defaultMaxListeners = 15;
 import jwt from 'jsonwebtoken' 
 import { sendOTP } from "../OTP/Otp.js";
+import product from "../modles/productSchema.js"
 
 
 export const userRegister=  async (req,res,next) =>{
@@ -108,3 +109,17 @@ export const Login = async (req, res,next) => {
       next(error)
     }
 };
+
+export const viewDishes = async (req,res) =>{
+  const dishes = await product.find();
+
+  if(!dishes){
+    res.status(404).send({status:"error",message:"dishes not found"})
+  }
+
+  res.status(200).send({
+    status:"success",
+    message:"successfully fetched data",
+    data:dishes
+  })
+}
