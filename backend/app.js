@@ -21,8 +21,8 @@ async function main(){
     console.log("db connected");
 }
 
-app.use(bodyParser.urlencoded({extended:true}))
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended:true}))
 app.use(express.json())
 app.use(cors())
 

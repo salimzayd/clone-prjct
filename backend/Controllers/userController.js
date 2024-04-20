@@ -1,5 +1,5 @@
 import tryCatchMiddleware from "../middlewares/tryCatchMiddleware.js";
-import users from "../modles/UserSchema.js";
+import users from "../modles/UserSchema.js"
 import Schemas from "../modles/validationSchema.js";
 import bcrypt from 'bcrypt'
 // import eventemitter from 'events'
