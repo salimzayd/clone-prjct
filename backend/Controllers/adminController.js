@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken'
 import Schemas from '../modles/validationSchema.js';
 import product from '../modles/productSchema.js';
+import UserSchema from '../modles/UserSchema.js';
 
 
 export const adminlogin = async (req,res) =>{
@@ -53,4 +54,22 @@ if(error){
         data:product
     })
 }
+}
+
+export const alluser = async(req,res) =>{
+const alluser = await UserSchema.find()
+
+
+if(alluser.length === 0){
+    return res.status(404).json({
+        status:"error",
+        message:"user not found"
+    })
+}
+
+res.status(200).json({
+    status:"successfully",
+    message:"successfully fetched users data",
+    data:alluser
+})
 }
