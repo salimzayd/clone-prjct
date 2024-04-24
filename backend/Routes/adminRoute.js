@@ -4,13 +4,13 @@ import  { adminlogin ,alluser,createproduct} from '../Controllers/adminControlle
 import  verifyToken  from '../Middlewares/adminAuthMiddleware.js';
 
 import tryCatchMiddleware from '../middlewares/tryCatchMiddleware.js';
-// import imageUpload from '../Middlewares/imageUpload/imageUpload.js';
+ import imageUpload from '../Middlewares/imageUpload/imageUpload.js';
 
 adminroute
 
 .post("/login",tryCatchMiddleware(adminlogin))
 .use(verifyToken)
-.post('/product',createproduct)
+.post('/product',imageUpload,createproduct)
 .get('/alluser',tryCatchMiddleware(alluser))
 
 export default adminroute

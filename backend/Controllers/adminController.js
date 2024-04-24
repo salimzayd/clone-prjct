@@ -43,8 +43,8 @@ if(error){
 }else{
     await product.create({
         title,
-        image,
         category,
+        image,
         price,
     })
 
