@@ -30,7 +30,7 @@ export const adminlogin = async (req,res) =>{
  }
 }
 
-export const createproduct = async (req,res) =>{
+export const createproduct = async (req,res,next) =>{
     const {value,error} = Schemas.joiproductSchema.validate(req.body)
     console.log(req.body);
 
@@ -56,6 +56,28 @@ if(error){
 }
 }
 
+export const allProduct = async(req,res) => {
+    const dishes = await product.find()
+    console.log(dishes,"gfh");
+
+    if(!dishes){
+        return(
+            res.status(404).json({
+                status:"error",
+                message:"dishes is not found"
+            })
+        )
+    }
+
+    res.status(200).json({
+        status:"success",
+        message:"successfully fetched dishes",
+        data:dishes
+    })
+}
+
+
+
 export const alluser = async(req,res) =>{
 const alluser = await UserSchema.find()
 
@@ -72,4 +94,25 @@ res.status(200).json({
     message:"successfully fetched users data",
     data:alluser
 })
+}
+
+
+// specific user
+
+export const userById = async(req,res) =>{
+    const userId= req.params.id
+    const user = await UserSchema.findById(userId)
+
+    if(!user){
+        return res.status(404).json({
+            status:"error",
+            message:"user not found"
+        });
+    }
+
+    res.status(200).json({
+        status:"success",
+        message:"successfully fetched user data",
+        data:user
+    })
 }

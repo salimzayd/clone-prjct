@@ -10,7 +10,7 @@ import userrouter from "./Routes/userRoute.js";
 import mongoose from "mongoose";
 import adminroute from "./Routes/adminRoute.js";
 
-const mongodb = "mongodb://127.0.0.1:27017/clone";
+const mongodb = process.env.MONGO_DB;
 
 main().catch((err) =>{
     console.log(err);
