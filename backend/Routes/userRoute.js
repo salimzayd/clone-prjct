@@ -16,7 +16,7 @@ userrouter
 .post("/verifyotp",tryCatchMiddleware(verifyOtp))
 .post("/login",tryCatchMiddleware(Login))
 .use(VerifyToken)
-.get("/viewproduct",tryCatchMiddleware(viewDishes))
+.get("/dishes",tryCatchMiddleware(viewDishes))
 
 
 

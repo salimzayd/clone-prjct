@@ -11,8 +11,9 @@ adminroute
 .post("/login",tryCatchMiddleware(adminlogin))
 .use(verifyToken)
 .post('/product',imageUpload,createproduct)
-.get('/Products',tryCatchMiddleware(allProduct))
-.get('/alluser',tryCatchMiddleware(alluser))
+.get('/Product',tryCatchMiddleware(allProduct))
+.get('/users',tryCatchMiddleware(alluser))
 .get('/users/:id',tryCatchMiddleware(userById))
+.get('/dishes',tryCatchMiddleware(allProduct))
 
 export default adminroute
