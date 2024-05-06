@@ -4,7 +4,7 @@ dotenv.config()
 
 const verifyToken = (req,res,next) =>{
     const authHeader = req.headers["authorization"]
-    console.log("token",authHeader);
+    // console.log("token",authHeader);
 
 
     if(!authHeader || !authHeader.startsWith('Bearer')){

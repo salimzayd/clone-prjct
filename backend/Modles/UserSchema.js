@@ -6,6 +6,14 @@ const userSchema = new mongoose.Schema({
     email:String,
     phonenumber:Number,
     password:String,
+    isActive:{
+        type:Boolean,
+        default:true
+    },
+    isBlocked:{
+        type:Boolean,
+        default:false
+    },
 
     cart:[{type:mongoose.Schema.ObjectId,ref:'product'}],
     orders:[{type:mongoose.Schema.ObjectId,ref:'orders'}]

@@ -90,6 +90,10 @@ export const Login = async (req, res,next) => {
         message:"user not found"
 
       })}
+
+      if (validuser.isBlocked) {
+        return res.status(403).json({ status: "error", message: "User is blocked" });
+    }
       // checking password
       const validpassword = await bcrypt.compare(password,validuser.password);
       if(!validpassword){
