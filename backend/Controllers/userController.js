@@ -127,3 +127,21 @@ export const viewDishes = async (req,res) =>{
     data:dishes
   })
 }
+
+export const singleDish = async (req,res) =>{
+  const dishId = req.params.id
+  const sdish = await product.findById(dishId)
+
+  if(!sdish){
+    return res.status(404).json({
+      status:"error",
+      message:"dish not found"
+    })
+  }
+
+  return res.status(200).json({
+    status:"success",
+    message:"successfully fetched dish data",
+    data:sdish
+  })
+}

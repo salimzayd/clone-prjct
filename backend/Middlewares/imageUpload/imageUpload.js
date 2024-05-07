@@ -32,34 +32,34 @@ cloudinary.config({
 // })
 
 
-const imageUpload = (req,res,next) =>{
-    upload.single("image")(req,res, async (err) =>{
-        if(err){
-            return res.status(400).json({
-                error:err.message
-            })
-        }
+const imageUpload = (req, res, next) => {
+    try {
+        upload.single("image")(req, res, async (err) => {
+            if (err) {
+                return res.status(400).json({
+                    error: err.message
+                })
+            }
 
-        try{
-            const result = await cloudinary.uploader.upload(req.file.path,{
-                folder:"FoodFleet-imgs"
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: "FoodFleet-imgs"
             })
 
             req.body.image = result.secure_url
 
-            fs.unlink(req.file.path,(unlinker) =>{
-                if(unlinker){
-                    console.log("error deleting localfiles",unlinker);
+            fs.unlink(req.file.path, (unlinker) => {
+                if (unlinker) {
+                    console.log("error deleting local files", unlinker);
                 }
             })
             next()
-        }
-        catch(error){
-            return res.status(500).json({
-                message:"error uploading file to cloudinary"
-            })
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: "error uploading file to cloudinary"
+        })
     }
-    })
 }
+
 
 export default imageUpload;
