@@ -2,7 +2,6 @@ import express from 'express';
 const adminroute = express.Router()
 import  { adminlogin ,allProduct,alluser,blockUser,createproduct, deleteDish, singleProduct, unblockuser, updateDish, userById} from '../Controllers/adminController.js'
 import  verifyToken  from '../Middlewares/adminAuthMiddleware.js';
-
 import tryCatchMiddleware from '../middlewares/tryCatchMiddleware.js';
  import imageUpload from '../Middlewares/imageUpload/imageUpload.js';
 

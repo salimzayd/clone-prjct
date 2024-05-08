@@ -35,7 +35,7 @@ export const createproduct = async (req,res) =>{
     const {value,error} = Schemas.joiproductSchema.validate(req.body)
     console.log(req.body);
 
-const {title,image,category,price} = value;
+const {title,image,category,price,description} = value;
 console.log(value);
 
 if(error){
@@ -47,6 +47,7 @@ if(error){
         category,
         image,
         price,
+        description
     })
 
     res.status(201).json({
