@@ -145,3 +145,62 @@ export const singleDish = async (req,res) =>{
     data:sdish
   })
 }
+
+export const addToCart = async  (req,res) =>{
+  const userId = req.params.id
+  const user = await users.findById(userId);
+  console.log(user);
+
+  if(!user){
+    return res.status(404).json0({
+      status:"error",
+      message:"user not found"
+    })
+  }
+
+  const {dishId} = req.body
+
+  if(!dishId){
+    return res.status(404).json({
+      status:"error",
+      message:"dish not found"
+    })
+  }
+
+  const newdish = await users.updateOne({_id:userId},{$addToSet:{cart:dishId}});
+  return res.status(200).json({
+    status:"success",
+    message:"dish successfully added to cart",
+    data:newdish
+  })
+}
+
+export const viewCart = async (req,res) =>{
+  const userId = req.params.id;
+  const user = awaitusers.findById(userId);
+
+  if(!user){
+    return res.status(404).json({
+      status:"error",
+      message:"user is not found"
+    })
+  }
+
+  const cartDishId = user.cart;
+  console.log("usrcart", user.cart);
+
+  if(cartDishId.length === 0){
+    return res.status(200).json({
+    status:"success",
+    message:"cart is empty",
+    data:[]
+})  
+}
+const cartDish = await product.find({_id:{$in:cartDishId}})
+
+res.status(200).json({
+  status:"success",
+  message:"cart product fetched successfully",
+  data:cartDish
+})
+}
