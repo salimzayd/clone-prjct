@@ -98,33 +98,47 @@ export const singleProduct = async (req,res,next) =>{
     }
 }
 
-export const updateDish = async (req,res,next) =>{
+export const updateDish = async (req,res) =>{
     try{
-        const {value,error} = Schemas.joiproductSchema.validate(req.body);
+         const {value,error} = Schemas.joiproductSchema.validate(req.body);
+        console.log(req.body,"gdhgjk")
+
         if(error){
             return res.status(400).json({
-                error:"error",
-                message:"error in validation"
+                status:"error",
+                message:"validation error"
             })
         }
-        const {_id} = req.params;
 
-            const updatedDishes = await product.findOneAndUpdate(
-                _id,
-                {$set:{...value}},
-                {new:true});
+        const { id } = req.params;
+        console.log(id,"tddfghjk");
 
-                if(updatedDishes){
-                    return res.status(200).json({
-                        status:"success",
-                        message:"successfully updated data",
-                        data:updatedDishes,
-                    })
-                }else{
-                    return next(tryCatchMiddleware(404,"dish not found"))
-                }
+        const updatedPackage = await product.findByIdAndUpdate(
+            id,
+            {$set:{...value}},
+            {new:true}
+        );
+
+        if(updatedPackage){
+            return res.status(200).json({
+                status:"success",
+                message:"successfully updated data",
+                data:updatedPackage
+                
+            });
+        
+        }
+        else{
+            return res.status(404).json({
+                status:"error",
+                message:"product not found"
+            })
+        }  
     }catch(error){
-        return next(error)
+        res.status(500).json({
+            status:"error",
+            message:"internal server error"
+        })
     }
 }
 
