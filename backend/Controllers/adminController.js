@@ -34,8 +34,7 @@ export const adminlogin = async (req,res) =>{
 export const createproduct = async (req,res) =>{
     const {value,error} = Schemas.joiproductSchema.validate(req.body)
     console.log(req.body);
-
-const {title,image,category,price,description} = value;
+    
 console.log(value);
 
 if(error){
@@ -43,11 +42,7 @@ if(error){
 
 }else{
     await product.create({
-        title,
-        category,
-        image,
-        price,
-        description
+        ...value
     })
 
     res.status(201).json({

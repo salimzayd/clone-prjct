@@ -204,3 +204,54 @@ res.status(200).json({
   data:cartDish
 })
 }
+
+
+
+// export const searchDish = async (req, res) => {
+//   try {
+//     const { title, category, _id } = req.query;
+//     let query = {};
+
+//     if (title) {
+//       query.title = { $regex: new RegExp(title, "i") };
+//     }
+
+//     if (category) {
+//       query.category = { $regex: new RegExp(category, "i") };
+//     }
+
+//     // Validate and handle `_id` if it's part of the query
+//     if (_id) {
+//       if (mongoose.Types.ObjectId.isValid(_id)) {
+//         query._id = mongoose.Types.ObjectId(_id);
+//       } else {
+//         return res.status(400).json({
+//           status: "error",
+//           message: "Invalid ID format",
+//         });
+//       }
+//     }
+
+//     const dishes = await product.find(query);
+
+//     if (dishes.length === 0) {
+//       return res.status(404).json({
+//         status: "error",
+//         message: "No dishes found with this criteria",
+//       });
+//     }
+
+//     return res.status(200).json({
+//       status: "success",
+//       message: "Dishes found",
+//       data: dishes,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({
+//       status: "error",
+//       message: "An error occurred while searching for dishes",
+//       error_message: error.message,
+//     });
+//   }
+// };

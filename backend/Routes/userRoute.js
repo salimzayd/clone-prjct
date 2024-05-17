@@ -18,6 +18,7 @@ userrouter
 .use(VerifyToken)
 .get("/dishes",tryCatchMiddleware(viewDishes))
 .get('/dishes/:id',tryCatchMiddleware(singleDish))
+// .get('/dishes/search',tryCatchMiddleware(searchDish))
 
 
 
