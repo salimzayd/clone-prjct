@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 
 const productSchema = new mongoose.Schema({
+   
     title:String,
     category:String,
     image:String,
@@ -9,6 +10,6 @@ const productSchema = new mongoose.Schema({
     description:String,
 },{timestamps:true})
 
-const product = mongoose.model('product',productSchema);
+const product = mongoose.model('products',productSchema);
 
 export default product;

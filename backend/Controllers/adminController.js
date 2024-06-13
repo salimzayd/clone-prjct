@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken'
-import Schemas from '../modles/validationSchema.js';
-import product from '../modles/productSchema.js';
-import UserSchema from '../modles/UserSchema.js';
+import Schemas from '../models/validationSchema.js';
+import product from '../models/productSchema.js';
+import UserSchema from '../models/UserSchema.js';
+import Order from '../models/orderSchema.js'
 import tryCatchMiddleware from '../middlewares/tryCatchMiddleware.js';
 
 
@@ -160,6 +161,7 @@ export const deleteDish = async (req,res,next) =>{
 
 export const alluser = async(req,res) =>{
 const alluser = await UserSchema.find()
+const allcount = await UserSchema.countDocuments()
 
 
 if(alluser.length === 0){
@@ -172,7 +174,8 @@ if(alluser.length === 0){
 res.status(200).json({
     status:"successfully",
     message:"successfully fetched users data",
-    data:alluser
+    data:alluser,
+    datacount:allcount
 })
 }
 
@@ -200,63 +203,64 @@ export const userById = async(req,res) =>{
 
 export const blockUser = async (req, res) => {
     try {
-        const userId = req.params.id
-        console.log('User ID:', userId);
-        const user = await UserSchema.findById(userId);
-        console.log(userId,"user");
-        
-        if (!user) {
-            console.error('User not found');
-            return res.status(404).json({ message: "User not found" });
-        }
+        const userid = req.params.id;
+        const action = req.query.action
 
-        if (user.isBlocked) {
-            console.error('User is already blocked');
-            return res.status(400).json({ message: "User is already blocked" });
-        }
-
-        user.isBlocked = true;
-        await user.save();
-
-        console.log('User blocked successfully');
-        res.status(200).json({ message: "User blocked successfully", user });
-    } catch (err) {
-        console.error('Error blocking user:', err);
-        return res.status(500).json({ message: "Internal server error" })
-}
-}
-
-
-export const unblockuser = async (req,res,next) =>{
-    try{
-        const userId = req.params.id
-        const user = await UserSchema.findById(userId)
-        console.log(userId);
-        console.log(user);
+        const user = await UserSchema.findById(userid);
 
         if(!user){
             return res.status(404).json({
                 status:"error",
                 message:"user not found"
-            })
+            });
         }
 
-        if(!user.isBlocked){
+        if(action === "block" && user.isBlocked){
             return res.status(400).json({
-                status:"error",
-                message:"user is not blocked"
+                message:"user is already blocked"
+            })
+        }else if (action === "unblock" && !user.isBlocked){
+            return res.status(400).json({
+                message:"user is blocked"
             })
         }
 
-        user.isBlocked = false
+        user.isBlocked = action === 'block';
+        await user.save();
 
-        await user.save()
-
+        const actionMessage = action === "block"? "blocked" : "unblocked"
         res.status(200).json({
-            message:"user is successfully unblocked",
-            status:"success"
+            message:`user ${actionMessage} successfully`,user
         })
-    }catch(err){
-        next(err)
+    }catch(error){
+        console.error(error);
+        }
     }
-}
+
+    export const getAllOrder = async (req, res) => {
+        try {
+            const orders = await Order.find().populate("usermodel products");
+            const allcount = orders.length;
+            console.log(allcount)
+    
+            if (orders.length === 0) {
+                return res.status(404).json({
+                    status: "error",
+                    message: "No orders found"
+                });
+            }
+            return res.status(200).json({
+                status: "success",
+                message: "All orders fetched successfully",
+                data: orders,
+                datacount: allcount,
+            });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({
+                status: "error",
+                message: "An error occurred while fetching orders",
+            });
+        }
+    };
+    

@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     email:String,
     phonenumber:Number,
     password:String,
+    image:String,
     isActive:{
         type:Boolean,
         default:true
@@ -16,7 +17,8 @@ const userSchema = new mongoose.Schema({
     },
 
     cart:[{type:mongoose.Schema.ObjectId,ref:'product'}],
-    orders:[{type:mongoose.Schema.ObjectId,ref:'orders'}]
+    orders:[{type:mongoose.Schema.ObjectId,ref:'orders'}],
+    review:[{type:mongoose.Schema.ObjectId,ref:'review'}]
 
 },{timestamps:true})
 

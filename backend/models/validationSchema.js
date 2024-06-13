@@ -17,9 +17,16 @@ const joiproductSchema = Joi.object({
     description:Joi.string(),
 })
 
+const joiReviewSchema = Joi.object({
+    user:Joi.string().required(),
+    products:Joi.string().required(),
+    rating:Joi.number().min(1).max(5).required(),
+    reviewText:Joi.string().min(10).required(),
+})
 
 
 
-const Schemas = { joiUserSchema,joiproductSchema} 
+
+const Schemas = { joiUserSchema,joiproductSchema,joiReviewSchema} 
 
 export default Schemas

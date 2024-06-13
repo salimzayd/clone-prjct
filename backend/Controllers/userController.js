@@ -1,12 +1,14 @@
 import tryCatchMiddleware from "../middlewares/tryCatchMiddleware.js";
-import users from "../modles/UserSchema.js"
-import Schemas from "../modles/validationSchema.js";
-import bcrypt from 'bcrypt'
-// import eventemitter from 'events'
-// eventemitter.defaultMaxListeners = 15;
-import jwt from 'jsonwebtoken' 
+import users from "../models/UserSchema.js";
+import Schemas from "../models/validationSchema.js";
+import Order from "../models/orderSchema.js";
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { sendOTP } from "../OTP/Otp.js";
-import product from "../modles/productSchema.js"
+import product from "../models/productSchema.js";
+import Razorpay from 'razorpay';
+
+
 
 
 export const userRegister=  async (req,res,next) =>{
@@ -31,45 +33,62 @@ export const userRegister=  async (req,res,next) =>{
         })
     }
 
-    // otp sending
-
-    try{
-    await sendOTP(req,res);
-
-    await users.save();
-    res.status(201).json("user created successfully")
-    }catch(error){
-        next(error)
-    }
-    // password hashing
-
     const hashedpassword = await 
     bcrypt.hash(password,10)
-
-    // user creation 
-
-    const userData = await users.create({
-        name:name,
-        email:email,
-        phonenumber:phonenumber,
-        password:hashedpassword
-    });
-
-    // success response 
-    return res.status(200).json({
-        status:"success",
-        message:"user registered successfully",
-        data:userData
+    
+    const newUser = new users({
+      name,
+      email,
+      phonenumber,
+      password:hashedpassword
     })
+    await newUser.save();
+
+    newUser.otpStatus = 'sent';
+    await newUser.save()
+
+    return res.status(201).json({
+      status:"success",
+      message:"user registered successfully",
+      userId:newUser._id
+    })
+
     }catch(error){
         console.error(error);
         return res.status(500).json({
             status:"error",
             message:"an unexpected error occured"
         })
+    } 
     }
-    
-    };
+
+    export const completeRegister = async (req,res) =>{
+      try{
+
+        const {userId,otp} = req.body;
+        const user = await users.findById(userId);
+        if(!user){
+          return res.status(404).json({
+            status:"error",
+            message:"user not found"
+          })
+        }
+
+        user.otpStatus = "verified";
+        await user.save()
+
+        return res.status(200).json({
+          status:"success",
+          message:"registration completed successfully"
+        })
+      }catch(error){
+        console.error(error)
+        return res.status(500).json({
+          status:"error",
+          message:"internal server error"
+        });
+      }
+    }
     
     //User login
 export const Login = async (req, res,next) => {
@@ -146,112 +165,301 @@ export const singleDish = async (req,res) =>{
   })
 }
 
-export const addToCart = async  (req,res) =>{
-  const userId = req.params.id
-  const user = await users.findById(userId);
-  console.log(user);
+// export const addToCart = async  (req,res) =>{
+//   const userId = req.params.id
+//   const user = await users.findById(userId);
+//   console.log(user);
 
-  if(!user){
-    return res.status(404).json0({
-      status:"error",
-      message:"user not found"
-    })
-  }
-
-  const {dishId} = req.body
-
-  if(!dishId){
-    return res.status(404).json({
-      status:"error",
-      message:"dish not found"
-    })
-  }
-
-  const newdish = await users.updateOne({_id:userId},{$addToSet:{cart:dishId}});
-  return res.status(200).json({
-    status:"success",
-    message:"dish successfully added to cart",
-    data:newdish
-  })
-}
-
-export const viewCart = async (req,res) =>{
-  const userId = req.params.id;
-  const user = awaitusers.findById(userId);
-
-  if(!user){
-    return res.status(404).json({
-      status:"error",
-      message:"user is not found"
-    })
-  }
-
-  const cartDishId = user.cart;
-  console.log("usrcart", user.cart);
-
-  if(cartDishId.length === 0){
-    return res.status(200).json({
-    status:"success",
-    message:"cart is empty",
-    data:[]
-})  
-}
-const cartDish = await product.find({_id:{$in:cartDishId}})
-
-res.status(200).json({
-  status:"success",
-  message:"cart product fetched successfully",
-  data:cartDish
-})
-}
-
-
-
-// export const searchDish = async (req, res) => {
-//   try {
-//     const { title, category, _id } = req.query;
-//     let query = {};
-
-//     if (title) {
-//       query.title = { $regex: new RegExp(title, "i") };
-//     }
-
-//     if (category) {
-//       query.category = { $regex: new RegExp(category, "i") };
-//     }
-
-//     // Validate and handle `_id` if it's part of the query
-//     if (_id) {
-//       if (mongoose.Types.ObjectId.isValid(_id)) {
-//         query._id = mongoose.Types.ObjectId(_id);
-//       } else {
-//         return res.status(400).json({
-//           status: "error",
-//           message: "Invalid ID format",
-//         });
-//       }
-//     }
-
-//     const dishes = await product.find(query);
-
-//     if (dishes.length === 0) {
-//       return res.status(404).json({
-//         status: "error",
-//         message: "No dishes found with this criteria",
-//       });
-//     }
-
-//     return res.status(200).json({
-//       status: "success",
-//       message: "Dishes found",
-//       data: dishes,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).json({
-//       status: "error",
-//       message: "An error occurred while searching for dishes",
-//       error_message: error.message,
-//     });
+//   if(!user){
+//     return res.status(404).json0({
+//       status:"error",
+//       message:"user not found"
+//     })
 //   }
-// };
+
+//   const {dishId} = req.body
+
+//   if(!dishId){
+//     return res.status(404).json({
+//       status:"error",
+//       message:"dish not found"
+//     })
+//   }
+
+//   const newdish = await users.updateOne({_id:userId},{$addToSet:{cart:dishId}});
+//   return res.status(200).json({
+//     status:"success",
+//     message:"dish successfully added to cart",
+//     data:newdish
+//   })
+// }
+
+// export const viewCart = async (req,res) =>{
+//   const userId = req.params.id;
+//   const user = awaitusers.findById(userId);
+
+//   if(!user){
+//     return res.status(404).json({
+//       status:"error",
+//       message:"user is not found"
+//     })
+//   }
+
+//   const cartDishId = user.cart;
+//   console.log("usrcart", user.cart);
+
+//   if(cartDishId.length === 0){
+//     return res.status(200).json({
+//     status:"success",
+//     message:"cart is empty",
+//     data:[]
+// })  
+// }
+// const cartDish = await product.find({_id:{$in:cartDishId}})
+
+// res.status(200).json({
+//   status:"success",
+//   message:"cart product fetched successfully",
+//   data:cartDish
+// })
+// }
+
+export const searchDishes = async (req,res)=>{
+  try{
+    const {title} = req.query;
+
+    let query = {}
+    console.log(query);
+
+    // if(category){
+    //   query.category = {$regex:new RegExp(category,'i')};
+    // }
+    // console.log(category);
+
+    if(title){
+      query.title = {$regex :new RegExp(title,'i')}
+    }
+    console.log(title);
+
+    const dishes = await product.find(query);
+    console.log(dishes,"dishessss");
+
+    if (dishes.length === 0){
+      return res.status(404).json({
+        status:"error",
+        message:"no dishes found in this specified criteria"
+      })
+    }
+    return res.status(200).json({
+      status:"success",
+      message:"dish found successfully",
+      data:dishes
+    }
+    )
+  }catch(error){
+    console.error(error);
+  }
+}
+
+// export const createProfile = async (req,res) =>{
+//   const {userId} = req.params;
+//   const{value,error} = Schemas.joiUserSchema.validate(req.body);
+
+//   try{
+//     if(error){
+//       return res.status(400).json({
+//         status:"error",
+//         message:"validation error"
+//       })
+//     }
+
+//     const user = await users.findById(userId);
+
+//     if(!user){
+//       return res.status(404).json({
+//         status:"error",
+//         message:"user not found"
+//       })
+//     }
+//     user.profile = value;
+//     await user.save();
+
+//     res.status(200).json({
+//       status:"success",
+//       message:"profile updated successfully",user
+//     })
+//   }catch(err){
+//     console.error(err);
+//   }
+// }
+
+export const singleUser = async (req,res) =>{
+  const {id} = req.params;
+
+  try{
+    const user = await users.findById(id);
+    if(user){
+      res.status(200).json({
+        status:"success",
+        message:"user fetched by id",
+        data:user
+      })
+    }
+  }catch(err){
+    console.error(err);
+  }
+}
+
+
+export const updateUser = async (req,res) =>{
+
+  try{
+    const {name,email,phonenumber,image} = req.body;
+
+    const {id} = req.params;
+
+    const updateDish = await users.findByIdAndUpdate(
+      id,
+      {$set:{name,email,phonenumber,image}},
+      {new:true}
+    );
+
+    if(updateDish){
+      return res.status(200).json({
+        status:"success",
+        message:"successfully updated data",
+        data:updateDish
+      })
+    }else{
+      return res.status(404)
+    }
+  }catch(error){
+    console.error(error);
+  }
+}
+
+export const deleteAccount = async(req,res) => {
+  const {id} = req.params
+  try{
+    const user = await users.findById(id);
+
+    if(!user){
+      return res.status(404).json({
+        status:"error",
+        message:"user not found"
+      })
+    }
+
+    await users.deleteOne({_id:id});
+    return res.status(200).json({
+      status:"success",
+      message:"successfully deleted user"
+    })
+  }catch(err){
+    console.error(err);
+  }
+}
+
+export const Payment = async (req,res) =>{
+  const razorpay = new Razorpay({
+    key_id:process.env.Razor_id,
+    key_secret:process.env.Razor_secret
+  });
+
+  const {amount,currency,receipt} = req.body;
+
+  try{
+    const payment = await razorpay.orders.create({amount,currency,receipt});
+    res.json({
+      status:"success",
+      message:"payment initiated",
+      data:payment,
+    })
+  }catch(error){
+    res.status(500).json({error:message});
+  }
+}
+const razorpay = new Razorpay({
+  key_id:process.env.Razor_id,
+  key_secret:process.env.Razor_secret
+});
+
+
+export const createOrder = async (req, res) => {
+  const { userId, productIds, amount, currency } = req.body;
+  console.log(req.body);
+
+  try {
+    const payment = await razorpay.orders.create({
+      amount: amount * 100,
+      currency,
+      receipt: `receipt_${Date.now()}`
+    });
+
+    const order = new Order({
+      usermodel: userId, // Ensure this matches the schema definition
+      products: productIds,
+      payment_id: payment.id,
+      total_amount: amount
+    });
+
+    await order.save();
+
+    res.status(201).json({
+      status: "success",
+      message: "Order created successfully",
+      data: order,
+      payment_id: payment.id
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "error",
+      message: "An error occurred while creating the order",
+      error: error.message
+    });
+  }
+};
+
+export const OrderDetails = async (req,res) =>{
+  const {id} = req.params
+
+  try{
+    const order = await Order.findById(id)
+    .populate('usermodel')
+    .populate('products');
+
+    if(!order){
+      return res.status(404).json({
+        status:"error",
+        message:"order not found"
+      })
+    }
+
+    res.status(200).json({
+      status:"success",
+      message:"order details fetched successfully",
+      data:order
+    })
+  }catch(error){
+    console.error(error);
+  }
+}
+
+export const allOrderDetails = async (req,res) =>{
+  try{
+    const order = await Order.find().populate('usermodel');
+    if(order.length === 0){
+      return res.status(404).json({
+        status:"error",
+        message:"order not found"
+      })
+    } res.status(200).json({
+      status:"success",
+      message:"All order fetched successfully",
+      data:order
+    })
+  }catch(error){
+    console.error(error);
+  }
+}
