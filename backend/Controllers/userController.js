@@ -4,7 +4,7 @@ import Schemas from "../models/validationSchema.js";
 import Order from "../models/orderSchema.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { sendOTP } from "../OTP/Otp.js";
+import { sendOTP } from "../otp/Otp.js";
 import product from "../models/productSchema.js";
 import Razorpay from 'razorpay';
 

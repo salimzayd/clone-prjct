@@ -2,7 +2,7 @@ import express from "express";
 const userrouter = express.Router();
 // import userController from "../Controllers/userController"
 import tryCatchMiddleware from "../middlewares/tryCatchMiddleware.js";
-import {  userRegister,Login, viewDishes, singleDish, searchDishes, Payment, createOrder, OrderDetails, allOrderDetails, updateUser, deleteAccount, singleUser} from "../Controllers/userController.js";
+import {  userRegister,Login, viewDishes, singleDish, searchDishes, Payment, createOrder, OrderDetails, allOrderDetails, updateUser, deleteAccount, singleUser} from "../controllers/userController.js";
 import { sendOTP, verifyOtp } from "../otp/Otp.js";
 import VerifyToken from "../middlewares/UserAuth.js";
 import imageupload from "../middlewares/imageUpload/imageUpload.js"
