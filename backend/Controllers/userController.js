@@ -11,7 +11,7 @@ import Razorpay from 'razorpay';
 
 
 
-export const userRegister=  async (req,res,next) =>{
+export const userRegister=  async (req,res) =>{
 
     try{
     const {value,error} = Schemas.joiUserSchema.validate(req.body)

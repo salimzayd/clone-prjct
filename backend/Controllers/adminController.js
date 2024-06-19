@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken'
 import Schemas from '../models/validationSchema.js';
 import product from '../models/productSchema.js';
@@ -97,7 +96,7 @@ export const singleProduct = async (req,res,next) =>{
 export const updateDish = async (req,res) =>{
     try{
          const {value,error} = Schemas.joiproductSchema.validate(req.body);
-        console.log(req.body,"gdhgjk")
+        console.log("update data :",req.body)
 
         if(error){
             return res.status(400).json({
@@ -107,7 +106,7 @@ export const updateDish = async (req,res) =>{
         }
 
         const { id } = req.params;
-        console.log(id,"tddfghjk");
+        console.log("product id :",id);
 
         const updatedPackage = await product.findByIdAndUpdate(
             id,
